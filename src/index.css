@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-ink-950 text-ink-50 font-sans antialiased;
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+  .phone-frame {
+    @apply relative mx-auto w-full max-w-[420px];
+    aspect-ratio: 420 / 900;
+  }
+
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .glass-strong {
+    @apply bg-white/10 backdrop-blur-2xl border border-white/15;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold rounded-2xl px-6 py-4
+           shadow-glow transition-all duration-200 active:scale-[0.97] hover:from-brand-400 hover:to-brand-500;
+  }
+
+  .btn-ghost {
+    @apply glass text-ink-50 font-semibold rounded-2xl px-6 py-4 transition-all duration-200 active:scale-[0.97];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium glass;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-400 via-brand-500 to-gold-400 bg-clip-text text-transparent;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 200% 100%;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
