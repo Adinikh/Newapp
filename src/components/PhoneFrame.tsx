@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 interface PhoneFrameProps {
   children: ReactNode
@@ -87,21 +88,37 @@ export function BottomNav() {
     { icon: 'message', label: 'Chats', path: '/chats' },
     { icon: 'user', label: 'Profile', path: '/profile' },
   ]
+  const activeIndex = Math.max(0, items.findIndex((item) => path === item.path || path.startsWith(item.path + '/')))
   return (
     <div className="sticky bottom-0 z-30 glass-strong border-t border-white/10 px-2 py-2 pb-5">
-      <div className="flex items-center justify-around">
-        {items.map((item) => {
-          const active = path === item.path
+      <div className="relative flex items-center justify-around">
+        {/* Animated active pill */}
+        <motion.div
+          className="absolute top-0 h-12 w-14 rounded-2xl bg-brand-500/15"
+          animate={{ left: `calc(${activeIndex * 25}% + ${activeIndex * 0}px)` }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          style={{ width: '25%' }}
+        />
+        {items.map((item, i) => {
+          const active = i === activeIndex
           return (
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className="flex flex-col items-center gap-1 px-4 py-1.5 active:scale-90 transition-transform"
+              className="relative flex flex-col items-center gap-1 px-4 py-1.5 active:scale-90 transition-transform z-10"
             >
-              <NavIcon name={item.icon} active={active} />
-              <span className={`text-[10px] font-semibold ${active ? 'text-brand-400' : 'text-ink-400'}`}>
+              <motion.div
+                animate={active ? { y: -2, scale: 1.15 } : { y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              >
+                <NavIcon name={item.icon} active={active} />
+              </motion.div>
+              <motion.span
+                animate={active ? { opacity: 1 } : { opacity: 0.6 }}
+                className={`text-[10px] font-semibold ${active ? 'text-brand-400' : 'text-ink-400'}`}
+              >
                 {item.label}
-              </span>
+              </motion.span>
             </button>
           )
         })}

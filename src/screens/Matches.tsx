@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { matches } from '../data/mock'
 import { BottomNav } from '../components/PhoneFrame'
+import { StaggerContainer, StaggerItem } from '../components/Animations'
 
 export function MatchesScreen() {
   const navigate = useNavigate()
@@ -13,12 +14,14 @@ export function MatchesScreen() {
       <div className="sticky top-0 z-30 px-5 pt-14 pb-3 glass-strong">
         <div className="flex items-center justify-between mb-4">
           <h1 className="font-display text-2xl font-bold">Matches</h1>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => navigate('/wingman')}
-            className="w-10 h-10 rounded-full glass flex items-center justify-center active:scale-90 transition-transform"
+            className="w-10 h-10 rounded-full glass flex items-center justify-center"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-300"><path d="M12 3l1.9 5.8a2 2 0 001.3 1.3L21 12l-5.8 1.9a2 2 0 00-1.3 1.3L12 21l-1.9-5.8a2 2 0 00-1.3-1.3L3 12l5.8-1.9a2 2 0 001.3-1.3L12 3z"/></svg>
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -57,20 +60,25 @@ export function MatchesScreen() {
 
         {/* All matches list */}
         <h2 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">All Matches</h2>
-        <div className="space-y-2">
-          {allMatches.map((m, i) => (
+        <StaggerContainer stagger={0.06} className="space-y-2">
+          {allMatches.map((m) => (
+            <StaggerItem key={m.id}>
             <motion.button
-              key={m.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05 }}
+              whileHover={{ scale: 1.02, x: 4 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => navigate(`/chat/${m.id}`)}
-              className="w-full flex items-center gap-3 p-3 rounded-2xl glass active:scale-[0.98] transition-transform"
+              className="w-full flex items-center gap-3 p-3 rounded-2xl glass"
             >
               <div className="relative shrink-0">
-                <img src={m.photo} alt={m.name} className="w-14 h-14 rounded-2xl object-cover" />
+                <motion.img
+                  whileHover={{ scale: 1.05 }}
+                  src={m.photo} alt={m.name} className="w-14 h-14 rounded-2xl object-cover" />
                 {m.online && (
-                  <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-teal-400 border-2 border-ink-950" />
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-teal-400 border-2 border-ink-950"
+                  />
                 )}
               </div>
               <div className="flex-1 text-left min-w-0">
@@ -88,14 +96,19 @@ export function MatchesScreen() {
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <span className="text-[10px] text-ink-500">{m.time}</span>
                 {m.unread > 0 && (
-                  <div className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-[10px] font-bold">
+                  <motion.div
+                    animate={{ scale: [1, 1.15, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-[10px] font-bold"
+                  >
                     {m.unread}
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </motion.button>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
 
       <BottomNav />

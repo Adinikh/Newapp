@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { safeVenues } from '../data/mock'
 import { ScreenHeader, BottomNav } from '../components/PhoneFrame'
+import { StaggerContainer, StaggerItem } from '../components/Animations'
 
 export function SafeVenuesScreen() {
   const navigate = useNavigate()
@@ -29,23 +30,39 @@ export function SafeVenuesScreen() {
         </motion.div>
 
         {/* Venue cards */}
-        <div className="space-y-4">
-          {safeVenues.map((venue, i) => (
+        <StaggerContainer stagger={0.12} className="space-y-4">
+          {safeVenues.map((venue) => (
+            <StaggerItem key={venue.id}>
             <motion.button
-              key={venue.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="w-full text-left glass rounded-3xl overflow-hidden active:scale-[0.98] transition-transform"
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full text-left glass rounded-3xl overflow-hidden"
             >
               <div className="relative h-40">
                 <img src={venue.image} alt={venue.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/30 to-transparent" />
                 {venue.verified && (
-                  <div className="absolute top-3 right-3 glass-strong rounded-full px-3 py-1.5 flex items-center gap-1.5">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-teal-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                    className="absolute top-3 right-3 glass-strong rounded-full px-3 py-1.5 flex items-center gap-1.5"
+                  >
+                    <motion.svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-teal-300"
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    ><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></motion.svg>
                     <span className="text-xs font-semibold text-teal-300">Verified Safe</span>
-                  </div>
+                  </motion.div>
                 )}
                 <div className="absolute bottom-3 left-3 right-3">
                   <h3 className="font-display text-lg font-bold mb-0.5">{venue.name}</h3>
@@ -60,7 +77,15 @@ export function SafeVenuesScreen() {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-1.5">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-gold-400"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <motion.svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="text-gold-400"
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    ><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></motion.svg>
                     <span className="font-semibold text-sm">{venue.rating}</span>
                     <span className="text-xs text-ink-400">/ 5</span>
                   </div>
@@ -76,8 +101,9 @@ export function SafeVenuesScreen() {
                 </div>
               </div>
             </motion.button>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         <button
           onClick={() => navigate(-1)}

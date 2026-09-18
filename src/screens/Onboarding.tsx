@@ -1,14 +1,17 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { AnimatedGradientMesh, FloatingParticles, MagneticButton, StaggerContainer, StaggerItem } from '../components/Animations'
 
 export function OnboardingScreen() {
   const navigate = useNavigate()
 
   return (
     <div className="relative h-full flex flex-col overflow-hidden bg-gradient-to-b from-ink-900 via-ink-950 to-brand-950">
-      {/* Background orbs */}
-      <div className="absolute top-20 -left-20 w-72 h-72 bg-brand-500/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-40 -right-20 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl" />
+      {/* Animated gradient mesh */}
+      <AnimatedGradientMesh colors={['#ff2d6340', '#ffb81f30', '#34c19f20']} />
+
+      {/* Floating particles */}
+      <FloatingParticles count={12} />
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 pt-16">
         <motion.div
@@ -17,14 +20,42 @@ export function OnboardingScreen() {
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="mb-8"
         >
-          {/* Logo */}
+          {/* Logo with orbiting sparkle */}
           <div className="relative">
-            <div className="w-28 h-28 rounded-5xl bg-gradient-to-br from-brand-400 via-brand-500 to-brand-700 flex items-center justify-center shadow-glow rotate-6">
-              <span className="font-display text-5xl font-bold text-white -rotate-6">R</span>
-            </div>
-            <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-3xl bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg -rotate-12">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </div>
+            <motion.div
+              animate={{ rotate: [6, -6, 6] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-28 h-28 rounded-5xl bg-gradient-to-br from-brand-400 via-brand-500 to-brand-700 flex items-center justify-center shadow-glow"
+            >
+              <span className="font-display text-5xl font-bold text-white">R</span>
+            </motion.div>
+            <motion.div
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+              className="absolute -bottom-2 -right-2 w-12 h-12"
+            >
+              <div className="w-12 h-12 rounded-3xl bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center shadow-lg">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
+            </motion.div>
+            {/* Orbiting dots */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+              className="absolute -inset-4 pointer-events-none"
+            >
+              {[0, 120, 240].map((deg) => (
+                <div
+                  key={deg}
+                  className="absolute w-2 h-2 rounded-full bg-brand-400"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    transform: `rotate(${deg}deg) translateY(-70px)`,
+                  }}
+                />
+              ))}
+            </motion.div>
           </div>
         </motion.div>
 
@@ -46,38 +77,45 @@ export function OnboardingScreen() {
           Verified college students only. Real connections, safe meetups, and an AI wingman that actually helps.
         </motion.p>
 
-        {/* Feature pills */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="space-y-3 w-full max-w-xs mb-10"
-        >
+        {/* Feature pills with stagger */}
+        <StaggerContainer delay={0.5} stagger={0.1} className="space-y-3 w-full max-w-xs mb-10">
           {[
             { icon: 'shield', text: 'College email & bonafide verified' },
             { icon: 'sparkles', text: 'AI Wingman for icebreakers & venues' },
             { icon: 'map', text: 'Recipro-verified safe meetup spots' },
           ].map((f, i) => (
-            <div key={i} className="flex items-center gap-3 glass rounded-2xl px-4 py-3">
-              <div className="w-9 h-9 rounded-xl bg-brand-500/20 flex items-center justify-center shrink-0">
-                <FeatureIcon name={f.icon} />
-              </div>
-              <span className="text-sm text-ink-100 font-medium">{f.text}</span>
-            </div>
+            <StaggerItem key={i}>
+              <motion.div
+                whileHover={{ scale: 1.03, x: 4 }}
+                className="flex items-center gap-3 glass rounded-2xl px-4 py-3"
+              >
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                  className="w-9 h-9 rounded-xl bg-brand-500/20 flex items-center justify-center shrink-0"
+                >
+                  <FeatureIcon name={f.icon} />
+                </motion.div>
+                <span className="text-sm text-ink-100 font-medium">{f.text}</span>
+              </motion.div>
+            </StaggerItem>
           ))}
-        </motion.div>
+        </StaggerContainer>
       </div>
 
       <div className="relative z-10 px-8 pb-10 space-y-3">
-        <motion.button
+        <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.65, duration: 0.5 }}
-          onClick={() => navigate('/login')}
-          className="btn-primary w-full text-base"
         >
-          Get Started
-        </motion.button>
+          <MagneticButton
+            onClick={() => navigate('/login')}
+            className="btn-primary w-full text-base"
+          >
+            Get Started
+          </MagneticButton>
+        </motion.div>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

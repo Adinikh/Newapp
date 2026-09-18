@@ -1,5 +1,7 @@
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { BottomNav } from '../components/PhoneFrame'
+import { StaggerContainer, StaggerItem } from '../components/Animations'
 
 export function ProfileScreen() {
   const photos = [
@@ -9,38 +11,61 @@ export function ProfileScreen() {
   ]
 
   const interests = ['Photography', 'Football', 'Travel', 'Food', 'Music', 'Coding']
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: scrollRef, offset: ['start start', 'end start'] })
+  const coverY = useTransform(scrollYProgress, [0, 1], [0, 120])
+  const coverScale = useTransform(scrollYProgress, [0, 1], [1, 1.3])
+  const avatarY = useTransform(scrollYProgress, [0, 1], [0, -40])
+  const avatarScale = useTransform(scrollYProgress, [0, 0.3, 1], [1, 0.85, 0.7])
 
   return (
     <div className="h-full flex flex-col bg-ink-950">
-      <div className="flex-1 overflow-y-auto scrollbar-none">
-        {/* Cover photo */}
-        <div className="relative h-48 overflow-hidden">
-          <img src={photos[0]} alt="cover" className="w-full h-full object-cover" />
+      <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-none">
+        {/* Parallax cover photo */}
+        <div className="relative h-52 overflow-hidden">
+          <motion.div style={{ y: coverY, scale: coverScale }} className="absolute inset-0">
+            <img src={photos[0]} alt="cover" className="w-full h-full object-cover" />
+          </motion.div>
           <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
           <div className="absolute top-14 right-5 flex gap-2">
-            <button className="w-10 h-10 rounded-full glass-strong flex items-center justify-center active:scale-90 transition-transform">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="w-10 h-10 rounded-full glass-strong flex items-center justify-center"
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>
-            </button>
-            <button className="w-10 h-10 rounded-full glass-strong flex items-center justify-center active:scale-90 transition-transform">
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              className="w-10 h-10 rounded-full glass-strong flex items-center justify-center"
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-            </button>
+            </motion.button>
           </div>
         </div>
 
         {/* Profile info */}
-        <div className="px-5 -mt-10 relative z-10">
+        <div className="px-5 -mt-12 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            style={{ y: avatarY, scale: avatarScale }}
             className="flex items-end gap-3 mb-4"
           >
             <div className="relative">
-              <div className="w-20 h-20 rounded-3xl overflow-hidden border-4 border-ink-950 shadow-card">
+              <motion.div
+                whileHover={{ scale: 1.05, rotate: -3 }}
+                className="w-20 h-20 rounded-3xl overflow-hidden border-4 border-ink-950 shadow-card"
+              >
                 <img src={photos[0]} alt="me" className="w-full h-full object-cover" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-teal-500 flex items-center justify-center border-2 border-ink-950">
+              </motion.div>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, delay: 0.2 }}
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-teal-500 flex items-center justify-center border-2 border-ink-950"
+              >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-              </div>
+              </motion.div>
             </div>
             <div className="pb-1">
               <div className="flex items-center gap-2">
@@ -51,73 +76,142 @@ export function ProfileScreen() {
           </motion.div>
 
           {/* Verification badges */}
-          <div className="flex gap-2 mb-5">
-            <div className="glass rounded-full px-3 py-1.5 flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-              <span className="text-xs font-semibold text-teal-300">Verified Student</span>
-            </div>
-            <div className="glass rounded-full px-3 py-1.5 flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-300"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-              <span className="text-xs font-semibold text-gold-300">Bonafide</span>
-            </div>
-          </div>
+          <StaggerContainer className="flex gap-2 mb-5">
+            <StaggerItem>
+              <div className="glass rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                <span className="text-xs font-semibold text-teal-300">Verified Student</span>
+              </div>
+            </StaggerItem>
+            <StaggerItem>
+              <div className="glass rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-300"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                <span className="text-xs font-semibold text-gold-300">Bonafide</span>
+              </div>
+            </StaggerItem>
+          </StaggerContainer>
 
           {/* Bio */}
-          <div className="glass rounded-2xl p-4 mb-5">
-            <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">About Me</h3>
-            <p className="text-sm text-ink-100 leading-relaxed">
-              Photographer & foodie. I know every hidden food joint in the city. Swipe right if you love biryani debates.
-            </p>
-          </div>
+          <StaggerContainer>
+            <StaggerItem>
+              <motion.div
+                whileHover={{ scale: 1.01 }}
+                className="glass rounded-2xl p-4 mb-5"
+              >
+                <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-2">About Me</h3>
+                <p className="text-sm text-ink-100 leading-relaxed">
+                  Photographer & foodie. I know every hidden food joint in the city. Swipe right if you love biryani debates.
+                </p>
+              </motion.div>
+            </StaggerItem>
 
-          {/* Photo grid */}
-          <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">My Photos</h3>
+            {/* Photo grid with staggered pop-in */}
+            <StaggerItem>
+              <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">My Photos</h3>
+            </StaggerItem>
+          </StaggerContainer>
           <div className="grid grid-cols-3 gap-2 mb-5">
             {photos.map((photo, i) => (
-              <div key={i} className="aspect-square rounded-2xl overflow-hidden">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08, type: 'spring', stiffness: 200 }}
+                whileHover={{ scale: 1.05, rotate: i % 2 === 0 ? 2 : -2 }}
+                className="aspect-square rounded-2xl overflow-hidden cursor-pointer"
+              >
                 <img src={photo} alt="" className="w-full h-full object-cover" />
-              </div>
+              </motion.div>
             ))}
-            <button className="aspect-square rounded-2xl border-2 border-dashed border-ink-700 flex flex-col items-center justify-center gap-1 text-ink-500 active:scale-95 transition-transform">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="aspect-square rounded-2xl border-2 border-dashed border-ink-700 flex flex-col items-center justify-center gap-1 text-ink-500"
+            >
+              <motion.svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                animate={{ rotate: [0, 90, 0] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              ><path d="M12 5v14M5 12h14"/></motion.svg>
               <span className="text-[10px] font-medium">Add</span>
-            </button>
+            </motion.button>
           </div>
 
-          {/* Interests */}
+          {/* Interests with pop-in */}
           <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">Interests</h3>
           <div className="flex flex-wrap gap-2 mb-5">
-            {interests.map((interest) => (
-              <span key={interest} className="chip text-sm">
+            {interests.map((interest, i) => (
+              <motion.span
+                key={interest}
+                initial={{ opacity: 0, scale: 0.7 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, type: 'spring', stiffness: 300 }}
+                whileHover={{ scale: 1.08, y: -2 }}
+                className="chip text-sm"
+              >
                 {interest}
-              </span>
+              </motion.span>
             ))}
-            <button className="chip text-sm text-brand-300 border-brand-400/30">
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              className="chip text-sm text-brand-300 border-brand-400/30"
+            >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
               Add
-            </button>
+            </motion.button>
           </div>
 
-          {/* Settings */}
+          {/* Settings with slide-in */}
           <h3 className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">Settings</h3>
-          <div className="space-y-2 mb-6">
+          <StaggerContainer stagger={0.06} className="space-y-2 mb-6">
             {[
               { icon: 'sliders', label: 'Discovery Preferences' },
               { icon: 'bell', label: 'Notifications' },
               { icon: 'shield', label: 'Privacy & Safety' },
               { icon: 'help', label: 'Help & Support' },
             ].map((item) => (
-              <button key={item.label} className="w-full flex items-center gap-3 glass rounded-2xl px-4 py-3.5 active:scale-[0.98] transition-transform">
-                <SettingIcon name={item.icon} />
-                <span className="flex-1 text-left text-sm font-medium">{item.label}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ink-500"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
+              <StaggerItem key={item.label}>
+                <motion.button
+                  whileHover={{ scale: 1.02, x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full flex items-center gap-3 glass rounded-2xl px-4 py-3.5"
+                >
+                  <SettingIcon name={item.icon} />
+                  <span className="flex-1 text-left text-sm font-medium">{item.label}</span>
+                  <motion.svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-ink-500"
+                    whileHover={{ x: 3 }}
+                  ><path d="M9 18l6-6-6-6"/></motion.svg>
+                </motion.button>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
 
-          <button className="w-full glass rounded-2xl px-4 py-3.5 text-sm font-semibold text-danger active:scale-[0.98] transition-transform mb-6">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full glass rounded-2xl px-4 py-3.5 text-sm font-semibold text-danger mb-6"
+          >
             Logout
-          </button>
+          </motion.button>
         </div>
       </div>
 

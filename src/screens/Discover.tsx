@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, type PanInfo } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform, type PanInfo } from 'framer-motion'
 import { profiles, type Profile } from '../data/mock'
 import { BottomNav } from '../components/PhoneFrame'
+import { FloatingHearts, MagneticButton, RippleButton } from '../components/Animations'
 
 export function DiscoverScreen() {
   const navigate = useNavigate()
@@ -46,22 +47,29 @@ export function DiscoverScreen() {
       {/* Top bar */}
       <div className="sticky top-0 z-30 px-5 pt-14 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shadow-glow">
+          <motion.div
+            initial={{ rotate: -10, scale: 0.8 }}
+            animate={{ rotate: 0, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200 }}
+            className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shadow-glow"
+          >
             <span className="font-display text-lg font-bold text-white">R</span>
-          </div>
+          </motion.div>
           <span className="font-display text-xl font-bold">Recipro</span>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => navigate('/wingman')}
-          className="w-10 h-10 rounded-full glass flex items-center justify-center active:scale-90 transition-transform"
+          className="w-10 h-10 rounded-full glass flex items-center justify-center"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-300"><path d="M12 3l1.9 5.8a2 2 0 001.3 1.3L21 12l-5.8 1.9a2 2 0 00-1.3 1.3L12 21l-1.9-5.8a2 2 0 00-1.3-1.3L3 12l5.8-1.9a2 2 0 001.3-1.3L12 3z"/></svg>
-        </button>
+        </motion.button>
       </div>
 
       {/* Card stack */}
       <div className="flex-1 relative px-4 pb-2">
-        <div className="relative h-full max-h-[640px]">
+        <div className="relative h-full max-h-[640px]" style={{ perspective: 1000 }}>
           <AnimatePresence initial={false} custom={direction}>
             <SwipeCard
               key={current.id}
@@ -74,10 +82,24 @@ export function DiscoverScreen() {
 
           {/* Stack shadow cards */}
           {index + 1 < profiles.length && (
-            <div className="absolute inset-0 scale-95 opacity-50 rounded-5xl overflow-hidden pointer-events-none">
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 0.95, opacity: 0.4 }}
+              className="absolute inset-0 rounded-5xl overflow-hidden pointer-events-none"
+            >
               <img src={profiles[index + 1].photos[0]} alt="" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-ink-950/40" />
-            </div>
+            </motion.div>
+          )}
+          {index + 2 < profiles.length && (
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 0.9, opacity: 0.2 }}
+              className="absolute inset-0 rounded-5xl overflow-hidden pointer-events-none"
+            >
+              <img src={profiles[index + 2].photos[0]} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-ink-950/60" />
+            </motion.div>
           )}
         </div>
       </div>
@@ -124,7 +146,6 @@ function SwipeCard({
   profile,
   direction,
   onDragEnd,
-  onSwipe,
 }: {
   profile: Profile
   direction: number
@@ -132,6 +153,13 @@ function SwipeCard({
   onSwipe: (dir: number) => void
 }) {
   const [photoIndex, setPhotoIndex] = useState(0)
+  const x = useMotionValue(0)
+  const rotate = useTransform(x, [-200, 200], [-15, 15])
+  const likeOpacity = useTransform(x, [40, 150], [0, 1])
+  const nopeOpacity = useTransform(x, [-150, -40], [1, 0])
+  const likeScale = useTransform(x, [40, 150], [0.8, 1.1])
+  const nopeScale = useTransform(x, [-150, -40], [1.1, 0.8])
+  const glowOpacity = useTransform(x, [-150, -40, 40, 150], [0.4, 0, 0, 0.4])
 
   return (
     <motion.div
@@ -139,13 +167,16 @@ function SwipeCard({
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.7}
       onDragEnd={onDragEnd}
-      initial={{ scale: 1, opacity: 1 }}
+      style={{ x, rotate }}
+      initial={{ scale: 0.9, opacity: 0, y: 20 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
       exit={{
         x: direction > 0 ? 500 : -500,
         opacity: 0,
-        rotate: direction > 0 ? 20 : -20,
+        rotate: direction > 0 ? 25 : -25,
         transition: { duration: 0.3 },
       }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className="absolute inset-0 rounded-5xl overflow-hidden shadow-card cursor-grab active:cursor-grabbing"
     >
       {/* Photo */}
@@ -159,13 +190,28 @@ function SwipeCard({
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/30 to-transparent" />
 
-      {/* Like / Pass indicators */}
-      <div className="absolute top-16 left-6 -rotate-12 border-4 border-teal-400 rounded-2xl px-5 py-2 text-teal-400 font-display text-2xl font-bold opacity-0 pointer-events-none">
+      {/* Drag glow */}
+      <motion.div
+        style={{ opacity: glowOpacity }}
+        className="absolute inset-0 pointer-events-none"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-danger/30 via-transparent to-teal-400/30" />
+      </motion.div>
+
+      {/* Like indicator */}
+      <motion.div
+        style={{ opacity: likeOpacity, scale: likeScale }}
+        className="absolute top-20 left-6 -rotate-12 border-4 border-teal-400 rounded-2xl px-5 py-2 text-teal-400 font-display text-2xl font-bold pointer-events-none"
+      >
         LIKE
-      </div>
-      <div className="absolute top-16 right-6 rotate-12 border-4 border-danger rounded-2xl px-5 py-2 text-danger font-display text-2xl font-bold opacity-0 pointer-events-none">
+      </motion.div>
+      {/* Nope indicator */}
+      <motion.div
+        style={{ opacity: nopeOpacity, scale: nopeScale }}
+        className="absolute top-20 right-6 rotate-12 border-4 border-danger rounded-2xl px-5 py-2 text-danger font-display text-2xl font-bold pointer-events-none"
+      >
         NOPE
-      </div>
+      </motion.div>
 
       {/* Photo dots */}
       <div className="absolute top-16 left-0 right-0 flex gap-1.5 px-5">
@@ -185,31 +231,48 @@ function SwipeCard({
 
       {/* Info */}
       <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
-        <div className="flex items-center gap-2 mb-1">
-          <h2 className="font-display text-3xl font-bold">{profile.name}</h2>
-          <span className="text-2xl font-light text-ink-200">{profile.age}</span>
-          {profile.verified && (
-            <div className="w-6 h-6 rounded-full bg-teal-500 flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center gap-2 text-sm text-ink-200 mb-3">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span>{profile.college}</span>
-          <span className="text-ink-500">·</span>
-          <span>{profile.year}</span>
-          <span className="text-ink-500">·</span>
-          <span>{profile.distance}</span>
-        </div>
-        <p className="text-sm text-ink-100 leading-relaxed mb-3 line-clamp-2">{profile.bio}</p>
-        <div className="flex flex-wrap gap-2">
-          {profile.interests.slice(0, 4).map((interest) => (
-            <span key={interest} className="chip text-xs">
-              {interest}
-            </span>
-          ))}
-        </div>
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="font-display text-3xl font-bold">{profile.name}</h2>
+            <span className="text-2xl font-light text-ink-200">{profile.age}</span>
+            {profile.verified && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+                className="w-6 h-6 rounded-full bg-teal-500 flex items-center justify-center"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              </motion.div>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-sm text-ink-200 mb-3">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>{profile.college}</span>
+            <span className="text-ink-500">·</span>
+            <span>{profile.year}</span>
+            <span className="text-ink-500">·</span>
+            <span>{profile.distance}</span>
+          </div>
+          <p className="text-sm text-ink-100 leading-relaxed mb-3 line-clamp-2">{profile.bio}</p>
+          <div className="flex flex-wrap gap-2">
+            {profile.interests.slice(0, 4).map((interest, i) => (
+              <motion.span
+                key={interest}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 + i * 0.05 }}
+                className="chip text-xs"
+              >
+                {interest}
+              </motion.span>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </motion.div>
   )
@@ -230,12 +293,14 @@ function ActionButton({
     spark: 'w-14 h-14 bg-gradient-to-br from-gold-400 to-gold-600 text-white shadow-lg',
   }
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.85 }}
       onClick={onClick}
-      className={`rounded-full flex items-center justify-center active:scale-90 transition-transform ${styles[variant]}`}
+      className={`rounded-full flex items-center justify-center transition-transform ${styles[variant]}`}
     >
       {icon}
-    </button>
+    </motion.button>
   )
 }
 
@@ -253,43 +318,104 @@ function MatchOverlay({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 z-50 bg-ink-950/90 backdrop-blur-md flex flex-col items-center justify-center px-8"
+      className="absolute inset-0 z-50 bg-ink-950/90 backdrop-blur-md flex flex-col items-center justify-center px-8 overflow-hidden"
     >
-      {/* Confetti dots */}
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 1, y: 0, x: 0 }}
-          animate={{ opacity: 0, y: -300, x: (Math.random() - 0.5) * 400 }}
-          transition={{ duration: 1.5, delay: Math.random() * 0.3 }}
-          className="absolute w-2 h-2 rounded-full"
-          style={{ backgroundColor: ['#ff2d63', '#ffb81f', '#34c19f', '#ff5d80'][i % 4] }}
-        />
-      ))}
+      {/* Floating hearts */}
+      <FloatingHearts count={14} />
+
+      {/* Confetti burst */}
+      {[...Array(24)].map((_, i) => {
+        const angle = (i / 24) * Math.PI * 2
+        const dist = 150 + Math.random() * 100
+        return (
+          <motion.div
+            key={i}
+            initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+            animate={{
+              opacity: 0,
+              x: Math.cos(angle) * dist,
+              y: Math.sin(angle) * dist,
+              scale: 0,
+              rotate: Math.random() * 360,
+            }}
+            transition={{ duration: 1.2, delay: Math.random() * 0.2, ease: 'easeOut' }}
+            className="absolute w-2.5 h-2.5 rounded-sm"
+            style={{
+              backgroundColor: ['#ff2d63', '#ffb81f', '#34c19f', '#ff5d80', '#ffffff'][i % 5],
+              top: '40%',
+              left: '50%',
+            }}
+          />
+        )
+      })}
 
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-        className="text-center"
+        className="text-center relative z-10"
       >
-        <h1 className="font-display text-5xl font-bold gradient-text mb-8">It's a Match!</h1>
+        <motion.h1
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="font-display text-5xl font-bold gradient-text mb-8"
+        >
+          It's a Match!
+        </motion.h1>
 
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <div className="w-28 h-28 rounded-5xl overflow-hidden border-4 border-brand-500 shadow-glow">
-            <img src={profile.photos[0]} alt={profile.name} className="w-full h-full object-cover" />
-          </div>
+        {/* Avatars with connecting line */}
+        <div className="flex items-center justify-center gap-4 mb-8 relative">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
-            className="w-14 h-14 rounded-full bg-brand-500 flex items-center justify-center shadow-glow"
+            initial={{ x: 80, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className="w-28 h-28 rounded-5xl overflow-hidden border-4 border-brand-500 shadow-glow"
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.29 1.51 4.04 3 5.5l7 7z"/></svg>
+            <img src={profile.photos[0]} alt={profile.name} className="w-full h-full object-cover" />
           </motion.div>
-          <div className="w-28 h-28 rounded-5xl overflow-hidden border-4 border-gold-400 shadow-lg">
+
+          {/* Animated connecting heart */}
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+            className="relative"
+          >
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+              className="w-14 h-14 rounded-full bg-brand-500 flex items-center justify-center shadow-glow"
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.29 1.51 4.04 3 5.5l7 7z"/></svg>
+            </motion.div>
+            {/* Sparkle ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+              className="absolute -inset-3 pointer-events-none"
+            >
+              {[0, 90, 180, 270].map((deg) => (
+                <div
+                  key={deg}
+                  className="absolute w-2 h-2 rounded-full bg-gold-400"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    transform: `rotate(${deg}deg) translateY(-26px)`,
+                  }}
+                />
+              ))}
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            initial={{ x: -80, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className="w-28 h-28 rounded-5xl overflow-hidden border-4 border-gold-400 shadow-lg"
+          >
             <img src="https://images.pexels.com/photos/15237424/pexels-photo-15237424.jpeg?auto=compress&cs=tinysrgb&h=300&w=300" alt="You" className="w-full h-full object-cover" />
-          </div>
+          </motion.div>
         </div>
 
         {/* Spark */}
@@ -300,19 +426,31 @@ function MatchOverlay({
           className="glass rounded-2xl px-5 py-4 mb-8 max-w-xs"
         >
           <div className="flex items-center gap-2 mb-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold-300"><path d="M12 3l1.9 5.8a2 2 0 001.3 1.3L21 12l-5.8 1.9a2 2 0 00-1.3 1.3L12 21l-1.9-5.8a2 2 0 00-1.3-1.3L3 12l5.8-1.9a2 2 0 001.3-1.3L12 3z"/></svg>
+            <motion.svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-gold-300"
+              animate={{ rotate: [0, 15, -15, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            ><path d="M12 3l1.9 5.8a2 2 0 001.3 1.3L21 12l-5.8 1.9a2 2 0 00-1.3 1.3L12 21l-1.9-5.8a2 2 0 00-1.3-1.3L3 12l5.8-1.9a2 2 0 001.3-1.3L12 3z"/></motion.svg>
             <span className="text-xs font-semibold text-gold-300 uppercase tracking-wider">Spark Icebreaker</span>
           </div>
           <p className="text-sm text-ink-100 text-left">{profile.spark}</p>
         </motion.div>
 
         <div className="flex flex-col gap-3 w-full max-w-xs">
-          <button onClick={onMessage} className="btn-primary text-base">
+          <MagneticButton onClick={onMessage} className="btn-primary text-base w-full">
             Send a Message
-          </button>
-          <button onClick={onClose} className="btn-ghost text-base">
+          </MagneticButton>
+          <RippleButton onClick={onClose} className="btn-ghost text-base w-full">
             Keep Swiping
-          </button>
+          </RippleButton>
         </div>
       </motion.div>
     </motion.div>
@@ -322,9 +460,13 @@ function MatchOverlay({
 function EmptyDeck({ onReset }: { onReset: () => void }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
-      <div className="w-20 h-20 rounded-5xl bg-ink-800 flex items-center justify-center mb-6">
+      <motion.div
+        animate={{ rotate: [0, -5, 5, 0], y: [0, -8, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        className="w-20 h-20 rounded-5xl bg-ink-800 flex items-center justify-center mb-6"
+      >
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-ink-500"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054-2-6 .5 2.5 0 3.5-1.5 5-1.5 1.5-2.5 3-2.5 5a5 5 0 0010 0z"/></svg>
-      </div>
+      </motion.div>
       <h2 className="font-display text-2xl font-bold mb-2">You're all caught up!</h2>
       <p className="text-ink-400 text-sm mb-6 max-w-xs">You've seen everyone nearby. Check back later or expand your filters.</p>
       <button onClick={onReset} className="btn-ghost">Reset Deck</button>
