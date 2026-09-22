@@ -218,7 +218,7 @@ export function ChatRoomScreen() {
               strokeLinejoin="round"
               animate={input.trim() ? { x: [0, 3, 0], y: [0, -3, 0] } : {}}
               transition={{ duration: 1, repeat: Infinity }}
-            ><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
+            ><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></motion.svg>
           </motion.button>
         </div>
       </div>

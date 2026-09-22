@@ -331,7 +331,7 @@ export function RippleButton({
             }}
           />
         ))}
-      ))}
+      </AnimatePresence>
       {children}
     </button>
   )
