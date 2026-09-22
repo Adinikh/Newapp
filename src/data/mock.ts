@@ -1,3 +1,5 @@
+export type VibeType = 'Explorer' | 'Homebody' | 'Creator' | 'Hustler' | 'Dreamer' | 'Socialite'
+
 export interface Profile {
   id: string
   name: string
@@ -10,6 +12,10 @@ export interface Profile {
   spark: string
   distance: string
   verified: boolean
+  vibe: VibeType
+  greenFlags: string[]
+  compatibility: number
+  traits: { label: string; value: number }[]
 }
 
 export const profiles: Profile[] = [
@@ -28,6 +34,15 @@ export const profiles: Profile[] = [
     spark: 'You both love indie music and have been to the same concert venue last month!',
     distance: '1.2 km away',
     verified: true,
+    vibe: 'Creator',
+    greenFlags: [' Replies within 10 min', ' Loves deep conversations', ' Has a 5-year plan'],
+    compatibility: 92,
+    traits: [
+      { label: 'Adventure', value: 78 },
+      { label: 'Creativity', value: 95 },
+      { label: 'Social', value: 60 },
+      { label: 'Chill', value: 72 },
+    ],
   },
   {
     id: 'p2',
@@ -44,6 +59,15 @@ export const profiles: Profile[] = [
     spark: 'You both follow the same startup podcast and love chess!',
     distance: '2.8 km away',
     verified: true,
+    vibe: 'Hustler',
+    greenFlags: [' Ambitious & driven', ' Plans dates in advance', ' Great listener'],
+    compatibility: 85,
+    traits: [
+      { label: 'Adventure', value: 65 },
+      { label: 'Creativity', value: 50 },
+      { label: 'Social', value: 82 },
+      { label: 'Chill', value: 45 },
+    ],
   },
   {
     id: 'p3',
@@ -60,6 +84,15 @@ export const profiles: Profile[] = [
     spark: 'You both are in the same campus book club!',
     distance: '0.8 km away',
     verified: true,
+    vibe: 'Dreamer',
+    greenFlags: [' Writes handwritten notes', ' Remembers the little things', ' Emotionally intelligent'],
+    compatibility: 88,
+    traits: [
+      { label: 'Adventure', value: 55 },
+      { label: 'Creativity', value: 88 },
+      { label: 'Social', value: 68 },
+      { label: 'Chill', value: 85 },
+    ],
   },
   {
     id: 'p4',
@@ -76,6 +109,15 @@ export const profiles: Profile[] = [
     spark: 'You both play guitar and love the same indie band!',
     distance: '3.5 km away',
     verified: true,
+    vibe: 'Creator',
+    greenFlags: [' Passionate about his craft', ' Introduces you to new music', ' Low-drama vibes'],
+    compatibility: 79,
+    traits: [
+      { label: 'Adventure', value: 70 },
+      { label: 'Creativity', value: 92 },
+      { label: 'Social', value: 55 },
+      { label: 'Chill', value: 78 },
+    ],
   },
   {
     id: 'p5',
@@ -92,6 +134,15 @@ export const profiles: Profile[] = [
     spark: 'You both volunteer at the same animal shelter!',
     distance: '1.5 km away',
     verified: true,
+    vibe: 'Explorer',
+    greenFlags: [' Dog mom energy', ' Initiates plans', ' Great communicator'],
+    compatibility: 90,
+    traits: [
+      { label: 'Adventure', value: 92 },
+      { label: 'Creativity', value: 70 },
+      { label: 'Social', value: 85 },
+      { label: 'Chill', value: 60 },
+    ],
   },
   {
     id: 'p6',
@@ -108,6 +159,69 @@ export const profiles: Profile[] = [
     spark: 'You both follow the same food blogger and love biryani!',
     distance: '4.2 km away',
     verified: true,
+    vibe: 'Socialite',
+    greenFlags: [' Knows the best food spots', ' Makes you laugh', ' Friends with everyone'],
+    compatibility: 82,
+    traits: [
+      { label: 'Adventure', value: 85 },
+      { label: 'Creativity', value: 75 },
+      { label: 'Social', value: 95 },
+      { label: 'Chill', value: 68 },
+    ],
+  },
+]
+
+export interface VibeQuestion {
+  id: string
+  question: string
+  emoji: string
+  options: { text: string; vibe: VibeType; emoji: string }[]
+}
+
+export const vibeQuestions: VibeQuestion[] = [
+  {
+    id: 'vq1',
+    question: 'Your ideal Sunday looks like...',
+    emoji: '☀️',
+    options: [
+      { text: 'Sunrise trek & breakfast at a new cafe', vibe: 'Explorer', emoji: '🏔️' },
+      { text: 'Blanket, books & endless chai', vibe: 'Homebody', emoji: '📚' },
+      { text: 'Painting or writing something new', vibe: 'Creator', emoji: '🎨' },
+      { text: 'Planning next week & side projects', vibe: 'Hustler', emoji: '💼' },
+    ],
+  },
+  {
+    id: 'vq2',
+    question: 'At a party, you are...',
+    emoji: '🎉',
+    options: [
+      { text: 'Talking to everyone on the dance floor', vibe: 'Socialite', emoji: '🕺' },
+      { text: 'Deep conversation in the balcony', vibe: 'Dreamer', emoji: '🌙' },
+      { text: 'Checking out the music setup', vibe: 'Creator', emoji: '🎧' },
+      { text: 'Home. Parties are not my thing.', vibe: 'Homebody', emoji: '🏠' },
+    ],
+  },
+  {
+    id: 'vq3',
+    question: 'What makes someone instantly attractive?',
+    emoji: '✨',
+    options: [
+      { text: 'Passion for what they do', vibe: 'Creator', emoji: '🔥' },
+      { text: 'Ambition & a plan', vibe: 'Hustler', emoji: '🚀' },
+      { text: 'Kindness & emotional depth', vibe: 'Dreamer', emoji: '💛' },
+      { text: 'Spontaneity & adventure', vibe: 'Explorer', emoji: '🧭' },
+    ],
+  },
+  {
+    id: 'vq4',
+    question: 'Your love language is...',
+    emoji: '💌',
+    options: [
+      { text: 'Quality time, just us', vibe: 'Homebody', emoji: '🛋️' },
+      { text: 'Surprise adventures together', vibe: 'Explorer', emoji: '🗺️' },
+      { text: 'Words of affirmation', vibe: 'Dreamer', emoji: '💬' },
+      { text: 'Showing up for your goals', vibe: 'Hustler', emoji: '🤝' },
+    ],
   },
 ]
 

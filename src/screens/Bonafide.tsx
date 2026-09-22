@@ -104,7 +104,7 @@ export function BonafideScreen() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            onClick={() => navigate('/discover')}
+            onClick={() => navigate('/vibe-quiz')}
             className="btn-primary w-full text-base"
           >
             Start Exploring

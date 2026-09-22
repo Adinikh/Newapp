@@ -5,6 +5,7 @@ import { OnboardingScreen } from './screens/Onboarding'
 import { PhoneLoginScreen } from './screens/PhoneLogin'
 import { OtpScreen } from './screens/Otp'
 import { BonafideScreen } from './screens/Bonafide'
+import { VibeQuizScreen } from './screens/VibeQuiz'
 import { DiscoverScreen } from './screens/Discover'
 import { MatchesScreen } from './screens/Matches'
 import { ChatsScreen } from './screens/Chats'
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/login" element={<PhoneLoginScreen />} />
           <Route path="/otp" element={<OtpScreen />} />
           <Route path="/bonafide" element={<BonafideScreen />} />
+          <Route path="/vibe-quiz" element={<VibeQuizScreen />} />
           <Route path="/discover" element={<DiscoverScreen />} />
           <Route path="/matches" element={<MatchesScreen />} />
           <Route path="/chats" element={<ChatsScreen />} />

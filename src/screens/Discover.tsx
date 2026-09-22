@@ -229,6 +229,33 @@ function SwipeCard({
       <div className="absolute top-14 left-0 w-1/2 h-1/2" onClick={() => setPhotoIndex(Math.max(0, photoIndex - 1))} />
       <div className="absolute top-14 right-0 w-1/2 h-1/2" onClick={() => setPhotoIndex(Math.min(profile.photos.length - 1, photoIndex + 1))} />
 
+      {/* Vibe badge top-right */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="absolute top-20 right-5 z-10"
+      >
+        <div className="glass-strong rounded-full px-3 py-1.5 flex items-center gap-1.5">
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-2 h-2 rounded-full bg-gold-400"
+          />
+          <span className="text-xs font-semibold text-gold-200">{profile.vibe}</span>
+        </div>
+      </motion.div>
+
+      {/* Compatibility ring top-left */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.35, type: 'spring', stiffness: 200 }}
+        className="absolute top-20 left-5 z-10"
+      >
+        <CompatibilityRing score={profile.compatibility} />
+      </motion.div>
+
       {/* Info */}
       <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
         <motion.div
@@ -258,9 +285,54 @@ function SwipeCard({
             <span className="text-ink-500">·</span>
             <span>{profile.distance}</span>
           </div>
-          <p className="text-sm text-ink-100 leading-relaxed mb-3 line-clamp-2">{profile.bio}</p>
+          <p className="text-sm text-ink-100 leading-relaxed mb-3 line-clamp-1">{profile.bio}</p>
+
+          {/* Green flags */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {profile.greenFlags.slice(0, 2).map((flag, i) => (
+              <motion.div
+                key={flag}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 + i * 0.08 }}
+                className="flex items-center gap-1 glass-strong rounded-full px-2.5 py-1"
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-teal-300">
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                  <path d="M22 4L12 14.01l-3-3" />
+                </svg>
+                <span className="text-[10px] font-medium text-teal-200">{flag}</span>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Personality trait bars */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-3"
+          >
+            {profile.traits.slice(0, 4).map((trait, i) => (
+              <div key={trait.label}>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-ink-400">{trait.label}</span>
+                  <span className="text-[10px] font-semibold text-ink-200">{trait.value}%</span>
+                </div>
+                <div className="h-1 rounded-full bg-ink-800 overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${trait.value}%` }}
+                    transition={{ delay: 0.6 + i * 0.1, duration: 0.8, ease: 'easeOut' }}
+                    className="h-full rounded-full bg-gradient-to-r from-brand-400 to-gold-400"
+                  />
+                </div>
+              </div>
+            ))}
+          </motion.div>
+
           <div className="flex flex-wrap gap-2">
-            {profile.interests.slice(0, 4).map((interest, i) => (
+            {profile.interests.slice(0, 3).map((interest, i) => (
               <motion.span
                 key={interest}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -275,6 +347,49 @@ function SwipeCard({
         </motion.div>
       </div>
     </motion.div>
+  )
+}
+
+function CompatibilityRing({ score }: { score: number }) {
+  const radius = 22
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (score / 100) * circumference
+  return (
+    <div className="relative w-14 h-14 flex items-center justify-center">
+      <svg width="56" height="56" className="absolute inset-0 -rotate-90">
+        <circle cx="28" cy="28" r={radius} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="4" />
+        <motion.circle
+          cx="28"
+          cy="28"
+          r={radius}
+          fill="none"
+          stroke="url(#compatGradient)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ delay: 0.5, duration: 1, ease: 'easeOut' }}
+        />
+        <defs>
+          <linearGradient id="compatGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ff5d80" />
+            <stop offset="100%" stopColor="#ffb81f" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="text-center">
+        <motion.span
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8, type: 'spring', stiffness: 200 }}
+          className="text-sm font-bold text-white block leading-none"
+        >
+          {score}
+        </motion.span>
+        <span className="text-[7px] text-ink-400 uppercase tracking-wider">match</span>
+      </div>
+    </div>
   )
 }
 
